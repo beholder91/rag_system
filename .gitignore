@@ -41,7 +41,7 @@ pip-delete-this-directory.txt
 *.ipynb
 
 # Data and Models
-data/knowledge_base/*
+data/*
 *.pt
 *.pth
 *.h5

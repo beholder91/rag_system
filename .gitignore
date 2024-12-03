@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Data and Models
+data/knowledge_base/*
+*.pt
+*.pth
+*.h5
+*.model
+*.bin
+saved_models/
+checkpoints/
+
+# Logs
+*.log
+logs/
+*/logs/
+log/
+*/log/
+
+# System
+.DS_Store
+Thumbs.db
+*.gz
+*.zip
+*.tar
+*.rar
+
+# Project specific
+config/api_key.py
+credentials.json
+.env
+test_results/
+temp/
+
+# Other
+*.bak
+*.tmp
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+*.cover

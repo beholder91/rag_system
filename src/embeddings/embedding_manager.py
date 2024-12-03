@@ -1,50 +1,69 @@
 # src/embeddings/embedding_manager.py
 
-from typing import List
-import torch
-from transformers import AutoModel, AutoTokenizer
+from typing import List, Dict, Any
+import numpy as np
+import requests
+from config.config import API_KEY
 
 class EmbeddingManager:
-    """管理文本嵌入的计算和存储"""
+    """管理文本嵌入的计算和存储，使用NeoLink AI API"""
     
     def __init__(self, model_name: str):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        self.model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
-        
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = self.model.to(self.device)
-        self.model.eval()
+        self.model_name = model_name
+        self.api_url = "https://neolink-ai.com/model/api/v1/embeddings"
+        self.headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {API_KEY}"
+        }
 
-    def compute_embeddings(self, texts: List[str], batch_size: int = 32) -> torch.Tensor:
+    def _call_api(self, text: str) -> List[float]:
+        """调用NeoLink AI API获取嵌入向量"""
+        try:
+            payload = {
+                "model": self.model_name,
+                "input": text,
+                "encoding_format": "float"
+            }
+            
+            response = requests.post(
+                self.api_url,
+                headers=self.headers,
+                json=payload
+            )
+            response.raise_for_status()
+            
+            result = response.json()
+            return result['data'][0]['embedding']
+            
+        except Exception as e:
+            print(f"获取嵌入向量失败: {e}")
+            return None
+
+    def compute_embeddings(self, texts: List[str], batch_size: int = 32) -> np.ndarray:
         """计算文本的嵌入向量"""
         embeddings = []
         
         for i in range(0, len(texts), batch_size):
             batch_texts = texts[i:i + batch_size]
-            batch_texts = [f"为这段文字生成表示：{text}" for text in batch_texts]
             
-            encoded = self.tokenizer(
-                batch_texts,
-                padding=True,
-                truncation=True,
-                max_length=512,
-                return_tensors='pt'
-            )
-            
-            input_ids = encoded['input_ids'].to(self.device)
-            attention_mask = encoded['attention_mask'].to(self.device)
-            
-            with torch.no_grad():
-                outputs = self.model(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask
-                )
-                batch_embeddings = outputs.last_hidden_state[:, 0]
-                embeddings.append(batch_embeddings)
+            # 由于API一次只处理一个文本，需要循环处理
+            for text in batch_texts:
+                embedding = self._call_api(text)
+                if embedding:
+                    embeddings.append(embedding)
         
-        all_embeddings = torch.cat(embeddings, dim=0)
-        return torch.nn.functional.normalize(all_embeddings, p=2, dim=1)
+        if not embeddings:
+            raise Exception("未能获取任何嵌入向量")
+            
+        # 将所有嵌入向量转换为numpy数组
+        embeddings_array = np.array(embeddings)
+        
+        # 进行L2归一化
+        norms = np.linalg.norm(embeddings_array, axis=1, keepdims=True)
+        normalized_embeddings = embeddings_array / norms
+        
+        return normalized_embeddings
 
-    def compute_similarity(self, query_embedding: torch.Tensor, doc_embeddings: torch.Tensor) -> torch.Tensor:
-        """计算查询向量与文档向量之间的相似度"""
-        return torch.cosine_similarity(query_embedding, doc_embeddings)
+    def compute_similarity(self, query_embedding: np.ndarray, doc_embeddings: np.ndarray) -> np.ndarray:
+        """计算查询向量与文档向量之间的余弦相似度"""
+        return np.dot(query_embedding, doc_embeddings.T)

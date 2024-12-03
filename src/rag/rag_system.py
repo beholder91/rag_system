@@ -2,12 +2,12 @@
 
 from typing import Dict, List, Optional
 from pathlib import Path
+import numpy as np
 
 from src.processors.document_processor import DocumentProcessor
 from src.embeddings.embedding_manager import EmbeddingManager
 from src.llm.llm_client import LLMClient
 from config.config import EMBEDDING_MODEL_NAME, CHUNK_SIZE, CHUNK_OVERLAP
-import torch
 
 class RAGSystem:
     """检索增强生成系统"""
@@ -52,16 +52,17 @@ class RAGSystem:
         similarities = self.embedding_manager.compute_similarity(
             query_embedding,
             self.embeddings
-        )
+        )[0]  # Get the first (and only) query's similarities
         
-        top_indices = torch.topk(similarities, min(top_k, len(self.documents)))
+        # Get top k indices
+        top_indices = np.argsort(similarities)[-top_k:][::-1]
         
         results = []
-        for score, idx in zip(top_indices.values, top_indices.indices):
+        for idx in top_indices:
             results.append({
                 'text': self.documents[idx].page_content,
                 'metadata': self.documents[idx].metadata,
-                'score': float(score)
+                'score': float(similarities[idx])
             })
         
         return results

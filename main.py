@@ -13,7 +13,7 @@ def main():
     )
     
     # 测试问答
-    question = "请提供徐佳烁 本月/近两个月 值班表"
+    question = "值班人员的职责是什么？"
     result = rag.answer_question(question)
     
     # 打印结果

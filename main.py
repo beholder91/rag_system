@@ -13,7 +13,7 @@ def main():
     )
     
     # 测试问答
-    question = "值班人员的职责是什么？"
+    question = "提供一下常用的DNS信息"
     result = rag.answer_question(question)
     
     # 打印结果

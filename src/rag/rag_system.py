@@ -2,15 +2,15 @@
 
 from typing import Dict, List, Optional
 from pathlib import Path
-import numpy as np
 
 from src.processors.document_processor import DocumentProcessor
 from src.embeddings.embedding_manager import EmbeddingManager
 from src.llm.llm_client import LLMClient
+from src.storage.mo_manager import MOManager
 from config.config import EMBEDDING_MODEL_NAME, CHUNK_SIZE, CHUNK_OVERLAP
 
 class RAGSystem:
-    """检索增强生成系统"""
+    """检索增强生成系统 - 集成MatrixOne向量存储"""
     
     def __init__(
         self,
@@ -23,49 +23,36 @@ class RAGSystem:
         self.doc_processor = DocumentProcessor(chunk_size, chunk_overlap)
         self.embedding_manager = EmbeddingManager(embedding_model_name)
         self.llm_client = LLMClient(api_key)
+        self.mo_manager = MOManager()
         
-        self.documents = []
-        self.embeddings = None
-        
-        self.load_knowledge_base(knowledge_base_dir)
+        if knowledge_base_dir:
+            self.load_knowledge_base(knowledge_base_dir)
 
     def load_knowledge_base(self, directory: str):
-        """加载并处理知识库文档"""
-        self.documents = self.doc_processor.process_documents(directory)
+        """加载并处理知识库文档，存储到MatrixOne"""
+        documents = self.doc_processor.process_documents(directory)
         
-        if self.documents:
-            texts = [doc.page_content for doc in self.documents]
-            self.embeddings = self.embedding_manager.compute_embeddings(texts)
+        if documents:
+            print(f"Processing {len(documents)} document chunks...")
+            for doc in documents:
+                # 计算embedding
+                embedding = self.embedding_manager.compute_embeddings([doc.page_content])[0]
+                
+                # 存储到MatrixOne
+                stored = self.mo_manager.store_document(
+                    file_path=doc.metadata['source'],
+                    chunk_content=doc.page_content,
+                    embedding=embedding.tolist()
+                )
+                if stored:
+                    print(f"Stored new document chunk from: {doc.metadata['source']}")
         else:
-            print("警告：没有加载到任何文档")
+            print("Warning: No documents loaded")
 
-    def retrieve(
-        self,
-        query: str,
-        top_k: int = 5
-    ) -> List[Dict]:
-        """检索相关文档"""
-        if not self.documents or self.embeddings is None:
-            return []
-            
-        query_embedding = self.embedding_manager.compute_embeddings([query])
-        similarities = self.embedding_manager.compute_similarity(
-            query_embedding,
-            self.embeddings
-        )[0]  # Get the first (and only) query's similarities
-        
-        # Get top k indices
-        top_indices = np.argsort(similarities)[-top_k:][::-1]
-        
-        results = []
-        for idx in top_indices:
-            results.append({
-                'text': self.documents[idx].page_content,
-                'metadata': self.documents[idx].metadata,
-                'score': float(similarities[idx])
-            })
-        
-        return results
+    def retrieve(self, query: str, top_k: int = 5) -> List[Dict]:
+        """从MatrixOne检索相关文档"""
+        query_embedding = self.embedding_manager.compute_embeddings([query])[0]
+        return self.mo_manager.retrieve_similar(query_embedding.tolist(), top_k)
 
     def answer_question(
         self,
@@ -84,3 +71,8 @@ class RAGSystem:
             'retrieved_documents': retrieved_docs,
             'prompt': prompt
         }
+
+    def __del__(self):
+        """确保正确关闭数据库连接"""
+        if hasattr(self, 'mo_manager'):
+            self.mo_manager.close()

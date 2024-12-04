@@ -9,7 +9,7 @@ def main():
     )
     
     # 测试问答
-    question = "提供一下常用的DNS信息"
+    question = "今天谁值班？"
     result = rag.answer_question(question)
     
     # 打印结果

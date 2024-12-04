@@ -1,7 +1,3 @@
-# 设置gpu环境
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "5"
-
 from config.config import API_KEY, KNOWLEDGE_BASE_DIR
 from src.rag.rag_system import RAGSystem
 
@@ -19,14 +15,14 @@ def main():
     # 打印结果
     print(f"\n问题: {result['query']}")
     print(f"\n回答: {result['answer']}")
-    print("\n", "-" * 50, "prompt", "-" * 50)
-    print(result["prompt"])
-    # print("\n检索到的文档:")
-    # for idx, doc in enumerate(result['retrieved_documents'], 1):
-    #     print(f"\n文档{idx}:")
-    #     print(f"内容: {doc['text']}")
-    #     print(f"来源: {doc['metadata']['source']}")
-    #     print(f"相似度: {doc['score']:.3f}")
+    # print("\n", "-" * 50, "prompt", "-" * 50)
+    # print(result["prompt"])
+    print("\n检索到的文档:")
+    for idx, doc in enumerate(result['retrieved_documents'], 1):
+        print(f"\n文档{idx}:")
+        print(f"内容: {doc['text']}")
+        print(f"来源: {doc['metadata']['source']}")
+        print(f"相似度: {doc['score']:.3f}")
 
 if __name__ == "__main__":
     main()

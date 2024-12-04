@@ -5,7 +5,7 @@ requests>=2.31.0
 pytz>=2024.1
 
 # Document processing
-unstructured>=0.11.0
+"unstructured[all-docs]">=0.11.0
 
 # Path and type hints
 pathlib>=1.0.1

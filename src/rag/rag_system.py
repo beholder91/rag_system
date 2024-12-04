@@ -54,9 +54,12 @@ class RAGSystem:
         else:
             print("Warning: No documents loaded")
 
-    def retrieve(self, query: str, top_k: int = 5) -> List[Dict]:
+    def retrieve(self, query: str, top_k: int = 5, threshold: float = 0.5) -> List[Dict]:
         query_embedding = self.embedding_manager.compute_embeddings([query])[0]
-        return self.storage.retrieve_similar(query_embedding.tolist(), top_k)
+        results = self.storage.retrieve_similar(query_embedding.tolist(), top_k)
+        # 过滤低于阈值的结果
+        filtered_results = [doc for doc in results if doc['score'] >= threshold]
+        return filtered_results
 
     def answer_question(
         self,

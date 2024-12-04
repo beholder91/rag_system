@@ -85,5 +85,5 @@ class LLMClient:
             prompt += f"\n文档{idx}:\n{doc['text']}\n"
             prompt += f"来源：{doc['metadata']['source']}\n"
             
-        prompt += "\n请参考以上信息回答问题："
+        prompt += "\n请参考以上信息，结合自己的知识回答问题："
         return prompt

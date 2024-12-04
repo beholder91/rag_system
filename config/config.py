@@ -6,7 +6,7 @@ from config.api_key import API_KEY
 # Project paths
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
-KNOWLEDGE_BASE_DIR = DATA_DIR / "knowledge_base"
+KNOWLEDGE_BASE_DIR = DATA_DIR / "new_knowledge_base"
 
 # Model configurations
 EMBEDDING_MODEL_NAME = "BAAI/bge-m3"

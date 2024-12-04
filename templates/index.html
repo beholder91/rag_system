@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能文档问答系统</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .user-message {
+            background: #e3f2fd;
+            margin-left: 20%;
+        }
+
+        .bot-message {
+            background: #f5f5f5;
+            margin-right: 20%;
+        }
+
+        .sources {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #uploadForm {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <h2>智能问答</h2>
+            <div class="chat-container" id="chatContainer"></div>
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="请输入您的问题..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()">发送</button>
+            </div>
+        </div>
+        <div class="panel">
+            <h2>文档管理</h2>
+            <form id="uploadForm">
+                <input type="file" id="fileInput" accept=".doc,.docx">
+                <button type="button" onclick="uploadFile()">上传文档</button>
+            </form>
+            <h3>已上传文档</h3>
+            <div class="file-list" id="fileList"></div>
+        </div>
+    </div>
+
+    <script>
+        // 加载文件列表
+        function loadFiles() {
+            fetch('/api/files')
+                .then(response => response.json())
+                .then(files => {
+                    const fileList = document.getElementById('fileList');
+                    fileList.innerHTML = files.map(file => 
+                        `<div class="file-item">${file}</div>`
+                    ).join('');
+                })
+                .catch(error => console.error('加载文件列表失败:', error));
+        }
+
+        // 上传文件
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('请选择文件');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.message || '上传成功');
+                loadFiles();
+                fileInput.value = '';
+            })
+            .catch(error => {
+                alert('上传失败: ' + error);
+                console.error('上传错误:', error);
+            });
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // 显示用户消息
+            appendMessage('user', message);
+            messageInput.value = '';
+
+            // 发送到服务器
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.answer) {
+                    appendMessage('bot', result.answer, result.sources);
+                } else {
+                    appendMessage('bot', '抱歉，处理您的问题时出现错误。');
+                }
+            })
+            .catch(error => {
+                appendMessage('bot', '抱歉，出现错误：' + error.message);
+                console.error('Chat error:', error);
+            });
+        }
+
+        // 添加消息到聊天界面
+        function appendMessage(type, text, sources = null) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = text;
+
+            if (sources) {
+                const sourcesDiv = document.createElement('div');
+                sourcesDiv.className = 'sources';
+                sourcesDiv.innerHTML = sources.map(source => `
+                    <div>
+                        <div>来源：${source.source.split('/').pop()}</div>
+                        <div>相似度：${(source.score * 100).toFixed(1)}%</div>
+                    </div>
+                `).join('');
+                messageDiv.appendChild(sourcesDiv);
+            }
+
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // 页面加载时获取文件列表
+        window.onload = loadFiles;
+    </script>
+</body>
+</html>

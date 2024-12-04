@@ -1,0 +1,12 @@
+# Core dependencies
+langchain>=0.1.0
+numpy>=1.21.0
+requests>=2.31.0
+pytz>=2024.1
+
+# Document processing
+unstructured>=0.11.0
+
+# Path and type hints
+pathlib>=1.0.1
+typing>=3.7.4

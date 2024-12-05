@@ -2,6 +2,7 @@
 
 from typing import Dict, List, Optional
 from pathlib import Path
+import os
 
 from src.processors.document_processor import DocumentProcessor
 from src.embeddings.embedding_manager import EmbeddingManager
@@ -82,3 +83,20 @@ class RAGSystem:
         """确保正确关闭数据库连接"""
         if hasattr(self, 'storage') and isinstance(self.storage, MOManager):
             self.storage.close()
+
+    def delete_file(self, file_path: str) -> bool:
+        """Delete file and its embeddings from storage"""
+        try:
+            # 1. Delete from storage
+            storage_deleted = self.storage.delete_document(file_path)
+            if not storage_deleted:
+                raise Exception("Failed to delete from storage")
+
+            # 2. Delete physical file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                
+            return True
+        except Exception as e:
+            print(f"Failed to delete file: {e}")
+            return False

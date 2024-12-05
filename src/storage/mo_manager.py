@@ -146,3 +146,16 @@ class MOManager(BaseStorage):
             self.close()
         except:
             pass
+
+    def delete_document(self, file_path: str) -> bool:
+        """Delete all chunks and embeddings for a given file from MatrixOne"""
+        try:
+            delete_sql = f"""
+            DELETE FROM {MO_TABLE} 
+            WHERE file_path = %s
+            """
+            self.cursor.execute(delete_sql, (file_path,))
+            return True
+        except Exception as e:
+            print(f"Failed to delete document from MatrixOne: {e}")
+            return False

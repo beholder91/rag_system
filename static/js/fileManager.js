@@ -41,7 +41,7 @@ export class FileManager {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            <span class="text-sm text-gray-700 truncate max-w-[200px]"></span>
+                            <span class="text-gray-700 truncate max-w-[200px]"></span>
                         </div>
                         <button id="clearFileBtn" class="p-1 hover:bg-gray-200 rounded-full transition-colors">
                             <svg class="w-5 h-5 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,14 +139,49 @@ export class FileManager {
         }
 
         fileList.innerHTML = files.map(file => `
-            <div class="file-item flex items-center p-3 hover:bg-gray-50 rounded-lg">
-                <svg class="w-5 h-5 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                <span class="text-gray-700">${file}</span>
+            <div class="file-item flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span class="text-gray-700">${file}</span>
+                </div>
+                <button class="delete-file-btn p-2 hover:bg-red-50 rounded-lg transition-colors" data-filename="${file}">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
             </div>
         `).join('');
+
+        // Add event listeners to delete buttons
+        const deleteButtons = fileList.querySelectorAll('.delete-file-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => this.deleteFile(button.dataset.filename));
+        });
+    }
+
+    async deleteFile(filename) {
+        if (!confirm(`确定要删除文件 ${filename} 吗？`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/files/${encodeURIComponent(filename)}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error('删除失败');
+            }
+
+            alert('文件删除成功');
+            await this.loadFiles(); // 重新加载文件列表
+        } catch (error) {
+            console.error('删除文件失败:', error);
+            alert('删除文件失败: ' + error.message);
+        }
     }
 
     async uploadFile() {

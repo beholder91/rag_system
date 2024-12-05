@@ -52,6 +52,25 @@ def list_files():
             files.append(filename)
     return jsonify(files)
 
+@app.route('/api/files/<filename>', methods=['DELETE'])
+def delete_file(filename):
+    try:
+        # 构建完整的文件路径
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # 检查文件是否存在
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'File not found'}), 404
+            
+        # 使用RAG系统的删除方法，它会同时处理存储和物理文件
+        if rag.delete_file(file_path):
+            return jsonify({'message': 'File deleted successfully'})
+        else:
+            return jsonify({'error': 'Failed to delete file'}), 500
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to delete file: {str(e)}'}), 500
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json

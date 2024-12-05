@@ -17,6 +17,11 @@ class BaseStorage(ABC):
         """Retrieve similar documents"""
         pass
 
+    @abstractmethod
+    def delete_document(self, file_path: str) -> bool:
+        """Delete all chunks and embeddings for a given file path"""
+        pass
+
 class MemoryStorage(BaseStorage):
     """In-memory storage implementation for fallback"""
     
@@ -67,7 +72,17 @@ class MemoryStorage(BaseStorage):
             results.append({
                 'text': doc['content'],
                 'metadata': {'source': doc['file_path']},
-                'score': float(similarity)  # 确保返回 Python float 类型
+                'score': float(similarity)
             })
         
         return results
+
+    def delete_document(self, file_path: str) -> bool:
+        """Delete all chunks related to the specified file"""
+        try:
+            # Filter out all documents from the specified file
+            self.documents = [doc for doc in self.documents if doc['file_path'] != file_path]
+            return True
+        except Exception as e:
+            print(f"Failed to delete document from memory storage: {e}")
+            return False

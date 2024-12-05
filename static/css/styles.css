@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+.chat-container::-webkit-scrollbar {
+    width: 6px;
+    background: transparent;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 3px;
+}
+
+.message { 
+    animation: fadeInUp 0.3s ease; 
+}
+
+.file-item { 
+    transition: transform 0.2s; 
+}
+
+.file-item:hover { 
+    transform: translateX(4px); 
+}
+
+.upload-area { 
+    transition: all 0.3s ease; 
+}
+
+.upload-area:hover, 
+.upload-area.drag-over { 
+    background: #f1f5f9; 
+}
+
+.file-preview {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}

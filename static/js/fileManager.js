@@ -155,21 +155,43 @@ export class FileManager {
             alert('请选择文件');
             return;
         }
-
+    
+        // 创建加载弹窗
+        const loadingModal = document.createElement('div');
+        loadingModal.innerHTML = `
+            <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-8 max-w-sm w-full mx-4 shadow-xl">
+                    <div class="flex flex-col items-center space-y-4">
+                        <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+                        <h3 class="text-lg font-semibold text-gray-900">正在处理文档</h3>
+                        <p class="text-gray-600 text-center text-sm">正在写入向量数据库，请稍候...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loadingModal);
+    
         const formData = new FormData();
         formData.append('file', file);
-
+    
         try {
             const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: formData
             });
             const result = await response.json();
+            
+            // 移除加载弹窗
+            document.body.removeChild(loadingModal);
+            
             alert(result.message || '上传成功');
             await this.loadFiles();
             this.fileInput.value = '';
             this.updateFileDisplay();
         } catch (error) {
+            // 确保在发生错误时也移除加载弹窗
+            document.body.removeChild(loadingModal);
+            
             alert('上传失败: ' + error);
             console.error('上传错误:', error);
         }

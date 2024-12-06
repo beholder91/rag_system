@@ -81,3 +81,7 @@ htmlcov/
 coverage.xml
 *.cover
 repomix-output.md
+test.py
+test.ipynb
+
+*.pdf

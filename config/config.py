@@ -30,3 +30,7 @@ MO_PASSWORD = "111"
 MO_DATABASE = "rag_db"
 MO_TABLE = "document_store"
 VECTOR_DIMENSION = 1024  # 根据embedding模型输出维度设置
+
+# Parse Server configurations
+PARSE_SERVER_URL = "http://localhost:9406"  # 添加这一行
+PARSE_SERVER_TIMEOUT = 30  # 设置超时时间（秒）

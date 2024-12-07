@@ -10,3 +10,7 @@ unstructured[all-docs]>=0.11.0
 # Path and type hints
 pathlib>=1.0.1
 typing>=3.7.4
+
+# 添加以下依赖
+requests>=2.31.0
+logging>=0.5.1.2

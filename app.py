@@ -6,7 +6,7 @@ from src.rag.rag_system import RAGSystem
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = KNOWLEDGE_BASE_DIR
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 增加到32MB
 
 # 确保上传目录存在
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -17,7 +17,9 @@ rag = RAGSystem(
     api_key=API_KEY
 )
 
-ALLOWED_EXTENSIONS = {'doc', 'docx'}
+# 修改支持的文件类型和大小限制
+ALLOWED_EXTENSIONS = {'doc', 'docx', 'pdf', 'txt', 'jpg', 'jpeg', 'png'}
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

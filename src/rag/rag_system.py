@@ -9,7 +9,7 @@ from src.embeddings.embedding_manager import EmbeddingManager
 from src.llm.llm_client import LLMClient
 from src.storage.mo_manager import MOManager
 from src.storage.base_storage import BaseStorage, MemoryStorage
-from config.config import EMBEDDING_MODEL_NAME, CHUNK_SIZE, CHUNK_OVERLAP
+from config.config import EMBEDDING_MODEL_NAME
 
 class RAGSystem:
     """检索增强生成系统 - 支持存储降级"""

@@ -10,8 +10,6 @@ KNOWLEDGE_BASE_DIR = DATA_DIR / "new_knowledge_base"
 
 # Model configurations
 EMBEDDING_MODEL_NAME = "BAAI/bge-m3"
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 50
 BATCH_SIZE = 32
 
 # API configurations 

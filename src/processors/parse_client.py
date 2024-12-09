@@ -1,3 +1,5 @@
+# src/processors/parse_client.py
+
 import logging
 import requests
 from typing import Optional
@@ -27,9 +29,8 @@ class ParseClient:
         
         try:
             with open(file_path, 'rb') as f:
-                files = {
-                    'file': (Path(file_path).name, f, 'application/octet-stream')
-                }
+                # 修改为正确的文件上传格式
+                files = {'file': f}
                 
                 response = requests.post(
                     f"{self.server_url}/parse/all_doc",

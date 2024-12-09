@@ -22,7 +22,8 @@ export class FileManager {
             <h2 class="text-xl font-semibold text-gray-900 mb-6">文档管理</h2>
             <div class="space-y-6">
                 <div class="upload-area p-6 bg-gray-50 rounded-lg">
-                    <input type="file" id="fileInput" class="hidden" accept=".doc,.docx">
+                    <input type="file" id="fileInput" class="hidden" 
+                           accept=".doc,.docx,.pdf,.txt,.jpg,.jpeg,.png">
                     <div id="uploadContent" class="text-center">
                         <label for="fileInput" class="cursor-pointer inline-flex flex-col items-center w-full">
                             <div class="p-3 bg-white rounded-full shadow-sm mb-3 inline-flex">
@@ -32,7 +33,7 @@ export class FileManager {
                                 </svg>
                             </div>
                             <span class="text-sm font-medium text-gray-600">拖拽文件到此处或点击上传</span>
-                            <span class="mt-2 text-xs text-gray-500">支持 .doc, .docx 格式</span>
+                            <span class="mt-2 text-xs text-gray-500">支持 .doc, .docx, .pdf, .txt, .jpg, .jpeg, .png 格式</span>
                         </label>
                     </div>
                     <div id="selectedFile" class="hidden file-preview">
@@ -138,14 +139,41 @@ export class FileManager {
             return;
         }
 
+        // 获取文件图标
+        const getFileIcon = (filename) => {
+            const ext = filename.split('.').pop().toLowerCase();
+            switch(ext) {
+                case 'pdf':
+                    return `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>`;
+                case 'doc':
+                case 'docx':
+                    return `<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>`;
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                    return `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>`;
+                default:
+                    return `<svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>`;
+            }
+        };
+
         fileList.innerHTML = files.map(file => `
             <div class="file-item flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
                 <div class="flex items-center">
-                    <svg class="w-5 h-5 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span class="text-gray-700">${file}</span>
+                    ${getFileIcon(file)}
+                    <span class="text-gray-700 ml-3">${file}</span>
                 </div>
                 <button class="delete-file-btn p-2 hover:bg-red-50 rounded-lg transition-colors" data-filename="${file}">
                     <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

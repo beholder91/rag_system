@@ -1,8 +1,6 @@
-# src/processors/parse_client.py
-
 import logging
 import requests
-from typing import Optional
+from typing import Optional, List, Dict
 from pathlib import Path
 
 class ParseClient:
@@ -23,13 +21,12 @@ class ParseClient:
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
             
-    def parse_document(self, file_path: str) -> Optional[str]:
-        """使用Parse Server解析文档"""
+    def parse_document(self, file_path: str) -> List[Dict]:
+        """使用Parse Server解析文档，返回文档块列表"""
         self.logger.info(f"开始处理文件: {Path(file_path).name}")
         
         try:
             with open(file_path, 'rb') as f:
-                # 修改为正确的文件上传格式
                 files = {'file': f}
                 
                 response = requests.post(
@@ -43,20 +40,26 @@ class ParseClient:
                 
                 if not isinstance(result, dict) or 'blocks' not in result:
                     self.logger.error("响应中缺少blocks字段")
-                    return None
-                    
-                # 从blocks中提取所有content字段
-                text_contents = []
+                    return []
+                
+                # 处理并返回有效的文档块
+                blocks = []
                 for block in result['blocks']:
                     if not block.get('is_image') and block.get('content'):
-                        text_contents.append(block['content'])
+                        blocks.append({
+                            'content': block['content'],
+                            'metadata': {
+                                'source': file_path,
+                                'block_type': block.get('type', 'text'),
+                                'page_num': block.get('page_num'),
+                                'position': block.get('position'),
+                                'is_title': block.get('is_title', False),
+                                'confidence': block.get('confidence', 1.0)
+                            }
+                        })
                 
-                if not text_contents:
-                    self.logger.warning("未提取到文本内容")
-                    return None
-                
-                self.logger.info("Parse Server解析成功")
-                return "\n".join(text_contents)
+                self.logger.info(f"Parse Server解析成功，获取到 {len(blocks)} 个文本块")
+                return blocks
                 
         except requests.Timeout:
             self.logger.error("Parse Server请求超时")

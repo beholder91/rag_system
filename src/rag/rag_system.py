@@ -18,11 +18,9 @@ class RAGSystem:
         self,
         knowledge_base_dir: str,
         api_key: str,
-        embedding_model_name: str = EMBEDDING_MODEL_NAME,
-        chunk_size: int = CHUNK_SIZE,
-        chunk_overlap: int = CHUNK_OVERLAP
+        embedding_model_name: str = EMBEDDING_MODEL_NAME
     ):
-        self.doc_processor = DocumentProcessor(chunk_size, chunk_overlap)
+        self.doc_processor = DocumentProcessor()
         self.embedding_manager = EmbeddingManager(embedding_model_name)
         self.llm_client = LLMClient(api_key)
         

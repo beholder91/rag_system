@@ -1,9 +1,12 @@
+/* 基础字体设置 */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
+/* 基础样式 */
 body { 
     font-family: 'Inter', sans-serif; 
 }
 
+/* 聊天容器滚动条样式 */
 .chat-container::-webkit-scrollbar {
     width: 6px;
     background: transparent;
@@ -14,10 +17,139 @@ body {
     border-radius: 3px;
 }
 
+/* 消息动画 */
 .message { 
     animation: fadeInUp 0.3s ease; 
 }
 
+/* Markdown 基础样式 */
+.message p {
+    margin-bottom: 0.75em;
+    line-height: 1.6;
+}
+
+/* 标题样式 */
+.message h1, .message h2, .message h3, .message h4, .message h5, .message h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.message h1 { font-size: 1.5em; }
+.message h2 { font-size: 1.4em; }
+.message h3 { font-size: 1.3em; }
+.message h4 { font-size: 1.2em; }
+.message h5 { font-size: 1.1em; }
+.message h6 { font-size: 1em; }
+
+/* 列表样式 */
+.message ul, .message ol {
+    margin: 0.5em 0 0.75em 1.5em;
+    padding-left: 0.5em;
+}
+
+.message ul {
+    list-style-type: disc;
+}
+
+.message ol {
+    list-style-type: decimal;
+}
+
+.message li {
+    margin-bottom: 0.25em;
+}
+
+/* 链接样式 */
+.message a {
+    color: #4F46E5;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.message a:hover {
+    color: #4338CA;
+}
+
+/* 代码块样式 */
+.message pre {
+    margin: 1em 0;
+    padding: 1em;
+    background-color: #1e1e1e;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+.message pre code {
+    display: block;
+    color: #d4d4d4;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875em;
+    line-height: 1.6;
+    padding: 0;
+    background: transparent;
+    tab-size: 4;
+}
+
+/* 行内代码样式 */
+.message code:not(pre code) {
+    padding: 0.2em 0.4em;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875em;
+}
+
+/* 表格样式 */
+.message table {
+    width: 100%;
+    margin: 1em 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.message th, .message td {
+    padding: 0.75em;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.message th {
+    background-color: #f8fafc;
+    font-weight: 600;
+}
+
+.message tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+/* 引用块样式 */
+.message blockquote {
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    border-left: 4px solid #e2e8f0;
+    background-color: #f8fafc;
+    color: #4a5568;
+}
+
+/* 水平线样式 */
+.message hr {
+    margin: 1.5em 0;
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* 图片样式 */
+.message img {
+    max-width: 100%;
+    height: auto;
+    margin: 1em 0;
+    border-radius: 6px;
+}
+
+/* 文件上传区域样式 */
 .file-item { 
     transition: transform 0.2s; 
 }
@@ -45,3 +177,39 @@ body {
     justify-content: space-between;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
+
+/* 代码高亮语言标签 */
+.message pre::before {
+    content: attr(data-language);
+    display: block;
+    background-color: #2d2d2d;
+    color: #808080;
+    font-size: 0.75em;
+    padding: 0.25em 0.5em;
+    margin: -1em -1em 1em -1em;
+    border-radius: 6px 6px 0 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+    .message pre {
+        margin: 0.75em -1em;
+        border-radius: 0;
+    }
+    
+    .message table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* 代码块中的特定语言样式 */
+.message .hljs-keyword { color: #569CD6; }
+.message .hljs-string { color: #CE9178; }
+.message .hljs-comment { color: #6A9955; }
+.message .hljs-number { color: #B5CEA8; }
+.message .hljs-function { color: #DCDCAA; }
+.message .hljs-class { color: #4EC9B0; }
+.message .hljs-variable { color: #9CDCFE; }

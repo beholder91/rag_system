@@ -1,35 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <style>
-        .message pre code {
-            display: block;
-            overflow-x: auto;
-            padding: 1em;
-            background: #f8f9fa;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-        
-        .message p {
-            margin-bottom: 0.5em;
-        }
-        
-        .message ul, .message ol {
-            margin-left: 1.5em;
-            margin-bottom: 0.5em;
-        }
-        
-        .message a {
-            color: #4F46E5;
-            text-decoration: underline;
-        }
-    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能文档问答系统</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <!-- 将原来的 github.min.css 替换为 vs2015.min.css -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -47,6 +25,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

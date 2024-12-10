@@ -20,9 +20,14 @@ export class ChatManager {
                 breaks: true,  // 支持GitHub风格的换行
                 gfm: true,     // 启用GitHub风格Markdown
                 highlight: function(code, language) {
-                    // 如果需要代码高亮，可以在这里集成Prism或Highlight.js
-                    return code;
-                }
+                    if (language && hljs.getLanguage(language)) {
+                        try {
+                            return hljs.highlight(code, { language }).value;
+                        } catch (__) {}
+                    }
+                    return hljs.highlight(code, { language: 'plaintext' }).value;
+                },
+                langPrefix: 'hljs language-'  // 添加highlight.js的类前缀
             });
         };
         document.head.appendChild(script);

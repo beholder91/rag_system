@@ -7,6 +7,25 @@ export class ChatManager {
     initialize() {
         this.renderChatPanel();
         this.bindEvents();
+        // 加载Marked.js库
+        this.loadMarkedJS();
+    }
+
+    loadMarkedJS() {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js';
+        script.onload = () => {
+            // 配置marked选项
+            marked.setOptions({
+                breaks: true,  // 支持GitHub风格的换行
+                gfm: true,     // 启用GitHub风格Markdown
+                highlight: function(code, language) {
+                    // 如果需要代码高亮，可以在这里集成Prism或Highlight.js
+                    return code;
+                }
+            });
+        };
+        document.head.appendChild(script);
     }
 
     renderChatPanel() {
@@ -79,7 +98,30 @@ export class ChatManager {
             'bg-indigo-600 text-white' : 
             'bg-gray-100 text-gray-800'
         }`;
-        contentDiv.textContent = text;
+        
+        // 使用marked渲染Markdown
+        if (typeof marked !== 'undefined') {
+            // 为用户消息和机器人消息使用不同的渲染处理
+            if (type === 'user') {
+                contentDiv.textContent = text;
+            } else {
+                contentDiv.innerHTML = marked.parse(text);
+                // 为代码块添加样式
+                contentDiv.querySelectorAll('pre code').forEach(block => {
+                    block.className = 'p-2 bg-gray-800 text-white rounded';
+                });
+                // 为表格添加基础样式
+                contentDiv.querySelectorAll('table').forEach(table => {
+                    table.className = 'border-collapse border border-gray-300 my-2';
+                    table.querySelectorAll('th, td').forEach(cell => {
+                        cell.className = 'border border-gray-300 p-2';
+                    });
+                });
+            }
+        } else {
+            contentDiv.textContent = text;
+        }
+        
         messageDiv.appendChild(contentDiv);
 
         if (sources?.length) {
